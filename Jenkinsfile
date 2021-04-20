@@ -7,7 +7,7 @@ pipeline{
     environment{
         GroupId = readMavenPom().getGroupId()
         Version = readMavenPom().getVersion()
-        ArtifactId = readMavenPom().getArtifactId()
+        //ArtifactId = readMavenPom().getArtifactId()
         Name = readMavenPom().getName()
     }
 
@@ -29,11 +29,21 @@ pipeline{
             }
         }
 
+        // Stage 4 : Print some information
+        stage ('Print Environment variables'){
+            steps {
+                //echo "Artifact ID is '${ArtifactId}'"
+                echo "Version is '${Version}'"
+                echo "GroupID is '${GroupId}'"
+                echo "Name is '${Name}'"
+                }
+        }
+
         // Stage3 : Publish artifacts to Nexus
         stage ('Publish to Nexus'){
             steps {
                 nexusArtifactUploader artifacts: 
-                [[artifactId: "${ArtifactId}", 
+                [[artifactId: 'DevOpsLab', 
                 classifier: '', 
                 file: 'target/DevOpsLab-0.0.3-SNAPSHOT.war', 
                 type: 'war']], 
