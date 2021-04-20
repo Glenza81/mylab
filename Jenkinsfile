@@ -4,10 +4,10 @@ pipeline{
     tools {
         maven 'maven'
     }
-    environment {
+    environment{
         GroupId = readMavenPom().getGroupId()
-        ArtifactId = readMavenPom().getArtifactId()
         Version = readMavenPom().getVersion()
+        ArtifactId = readMavenPom().getArtifactId()
         Name = readMavenPom().getName()
     }
 
