@@ -4,6 +4,12 @@ pipeline{
     tools {
         maven 'maven'
     }
+    environment {
+        GroupId = readMavenPom().getGroupId()
+        ArtifactId = readMavenPom().getArtifactId()
+        Version = readMavenPom().getVersion()
+        Name = readMavenPom().getName()
+    }
 
     stages {
         // Specify various stage with in stages
@@ -26,8 +32,18 @@ pipeline{
         // Stage3 : Publish artifacts to Nexus
         stage ('Publish to Nexus'){
             steps {
-                nexusArtifactUploader artifacts: [[artifactId: 'DevOpsLab', classifier: '', file: 'target/DevOpsLab-0.0.3-SNAPSHOT.war', type: 'war']], credentialsId: '06f37ef0-094c-4c62-96b5-1e30190f4a99', groupId: 'com.devopslab', nexusUrl: '172.20.10.142:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'DevOpsLab-SNAPSHOT', version: '0.0.3-SNAPSHOT'
-
+                nexusArtifactUploader artifacts: 
+                [[artifactId: "${ArtifactId}", 
+                classifier: '', 
+                file: 'target/DevOpsLab-0.0.3-SNAPSHOT.war', 
+                type: 'war']], 
+                credentialsId: '06f37ef0-094c-4c62-96b5-1e30190f4a99', 
+                groupId: "${GroupId}", 
+                nexusUrl: '172.20.10.142:8081', 
+                nexusVersion: 'nexus3', 
+                protocol: 'http', 
+                repository: 'DevOpsLab-SNAPSHOT', 
+                version: "${Version}"
             }
         }
 
