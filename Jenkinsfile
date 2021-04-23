@@ -29,13 +29,13 @@ pipeline{
         }
 
         // Stage : Print some information
-        stage ('Print Environment variables'){
-            steps {
-                echo "GroupID is '${GroupId}'"
-                echo "Artifact ID is '${ArtifactId}'"
-                echo "Version is '${Version}'"
-                }
-        }
+        // stage ('Print Environment variables'){
+        //     steps {
+        //         echo "GroupID is '${GroupId}'"
+        //         echo "Artifact ID is '${ArtifactId}'"
+        //         echo "Version is '${Version}'"
+        //         }
+        // }
 
         // Stage3 : Publish artifacts to Nexus
         stage ('Publish to Nexus'){
@@ -60,10 +60,10 @@ pipeline{
             }
         }
 
-        // Stage4 : Deploy
-        stage ('Deploy'){
+        // Stage4
+        stage ('Deploy to Tomcat'){
             steps {
-                echo "Deploying ..."
+                echo "Deploying to tomcat ..."
                 sshPublisher(
                     publishers: [
                         sshPublisherDesc(
@@ -81,6 +81,28 @@ pipeline{
                                     remoteDirectorySDF: false, 
                                     removePrefix: '', 
                                     sourceFiles: '')
+                            ], 
+                            usePromotionTimestamp: false, 
+                            useWorkspaceInPromotion: false, 
+                            verbose: false)
+                        ])
+                }
+        }
+
+        // Stage5
+        stage ('Deploy to Docker'){
+            steps {
+                echo "Deploying to docker ..."
+                sshPublisher(
+                    publishers: [
+                        sshPublisherDesc(
+                            configName: 'Ansible-Controller', 
+                            transfers: [
+                                sshTransfer(
+                                    cleanRemote: false, 
+                                    execCommand: 'ansible-playbook /opt/playbooks/download_deploy_to_docker.yaml -i /opt/playbooks/hosts', 
+                                    execTimeout: 120000 
+                                )
                             ], 
                             usePromotionTimestamp: false, 
                             useWorkspaceInPromotion: false, 
