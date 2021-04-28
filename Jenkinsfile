@@ -13,17 +13,28 @@ pipeline{
     stages {
         // Specify various stage with in stages
 
-        // stage 1. Build
+        // stage 1
         stage ('Build'){
             steps {
                 sh 'mvn clean install'
             }
         }
 
-        // Stage2 : Testing
+        // Stage2
         stage ('Test'){
             steps {
                 echo ' testing......'
+
+            }
+        }
+
+        // Stage3
+        stage ('Sonarqube Analysis') {
+            steps {
+                echo ' Source code published to Sonarqube for Static Code Analysis'
+                withSonarQubeEnv('sonarqube') {
+                    sh 'mvn sonar:sonar'
+                }
 
             }
         }
@@ -37,7 +48,7 @@ pipeline{
         //         }
         // }
 
-        // Stage3 : Publish artifacts to Nexus
+        // Stage4 : Publish artifacts to Nexus
         stage ('Publish to Nexus'){
             steps {
                 script {
@@ -60,7 +71,7 @@ pipeline{
             }
         }
 
-        // Stage4
+        // Stage5
         stage ('Deploy to Tomcat'){
             steps {
                 echo "Deploying to tomcat ..."
@@ -89,7 +100,7 @@ pipeline{
                 }
         }
 
-        // Stage5
+        // Stage6
         stage ('Deploy to Docker'){
             steps {
                 echo "Deploying to docker ..."
