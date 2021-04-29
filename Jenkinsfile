@@ -16,7 +16,7 @@ pipeline{
         // stage 1
         stage ('Build'){
             steps {
-                sh 'mvn clean install'
+                sh 'mvn clean package'
             }
         }
 
@@ -35,6 +35,15 @@ pipeline{
                 withSonarQubeEnv('sonarqube') {
                     sh 'mvn sonar:sonar'
                 }
+            }
+        }
+
+        // Stage4
+        stage ('Quality Gate'){
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
 
             }
         }
@@ -48,7 +57,7 @@ pipeline{
         //         }
         // }
 
-        // Stage4 : Publish artifacts to Nexus
+        // Stage5 : Publish artifacts to Nexus
         stage ('Publish to Nexus'){
             steps {
                 script {
@@ -71,7 +80,7 @@ pipeline{
             }
         }
 
-        // Stage5
+        // Stage6
         stage ('Deploy to Tomcat'){
             steps {
                 echo "Deploying to tomcat ..."
@@ -100,7 +109,7 @@ pipeline{
                 }
         }
 
-        // Stage6
+        // Stage7
         stage ('Deploy to Docker'){
             steps {
                 echo "Deploying to docker ..."
@@ -122,18 +131,6 @@ pipeline{
                 }
         }
 
-        // Stage3 : Publish the source code to Sonarqube
-        // stage ('Sonarqube Analysis'){
-        //     steps {
-        //         echo ' Source code published to Sonarqube for SCA......'
-        //         withSonarQubeEnv('sonarqube'){ // You can override the credential to be used
-        //              sh 'mvn sonar:sonar'
-        //         }
-
-        //     }
-        // }
-
-        
         
     }
 
